@@ -28,47 +28,49 @@ This project is a full-stack web application that demonstrates the integration o
 
 
 
-### Data Flow
-
-Diagram: System Architecture ![System Architecture](./C:\Users\Windows\Desktop\cw\Advanced_serverside_coursework-1\images\image.png)
-
-
-+-------------+       HTTP        +----------------+       SQL       +-----------+
-|   React.js  |  <------------->  |  Node.js API   |  <----------->  |  MySQL DB |
-|   Frontend  |                   |   Backend      |                 |           |
-+-------------+                   +----------------+                 +-----------+
-         |                             |   ^                                |
-         | JWT Auth                    |   | Sequelize ORM                  |
-         +-----------------------------+   +--------------------------------+
-
-
 # System Architecture
-Below is a high-level architecture diagram that shows how the different components interact:
-pgsql
-CopyEdit
-   +------------------+         +---------------------+         +---------------------+
-    |   React Frontend |  <--->  |   Node.js Backend   |  <--->  |   MySQL Database    |
-    +------------------+         +---------------------+         +---------------------+
-    |  - User Interface|         |  - API Endpoints    |         |  - Data Storage     |
-    |  - Displays Data |         |  - Business Logic   |         |  - Tables (Users,   |
-    |  - API Requests  |         |  - Controllers      |         |    Products, etc.)  |
-    |  - User Actions  |         |  - Middleware       |         |  - Queries (CRUD)   |
-    +------------------+         +---------------------+         +---------------------+
-              ^                            |                              |
-              |                            |                              |
-              +----------------------------+------------------------------+
-                                         |
-                                      JWT Authentication
-                                    (Token-based Security)
+ystem Architecture
+The application follows a full-stack architecture with the following components:
+
+Frontend (React.js):
+
+Provides the user interface (UI) and handles user interactions.
+
+Communicates with the backend via HTTP requests.
+
+Manages JWT tokens for user authentication and session management.
+
+Backend (Node.js API):
+
+Built with Node.js and Express.js, responsible for handling API requests.
+
+Implements business logic, processes data, and interacts with the MySQL database.
+
+Uses JWT authentication middleware to secure protected routes.
+
+Uses Sequelize ORM to interact with the MySQL database.
+
+Database (MySQL):
+
+Stores user data, authentication information, and application data.
+
+Managed using Sequelize ORM for CRUD operations.
+
+Authentication:
+
+JWT tokens are used for secure authentication, ensuring only authenticated users can access protected routes.
+
+Deployment:
+
+The entire application is containerized using Docker for easy deployment across different environments.
 # Environment Variables
 Backend .env
 
+JWT_SECRET=your_secret_key_here
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=yourpassword
-DB_NAME=your_database_name
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRATION=1h
+DB_PASSWORD=1234
+DB_NAME=user_registration_db
 PORT=5000
 
 DB_HOST, DB_USER, DB_PASSWORD, DB_NAME: Your MySQL database connection details.
@@ -183,27 +185,34 @@ JWT Authentication: Ensures only logged-in users access their API keys
 
 RESTful API Design: Clear route separation and stateless operations
 
-# Docker Container Diagram
-You can include a container-based diagram like:
-diff
-CopyEdit
-+------------------------+
-|     React Frontend     |  → Port 3000
-+------------------------+
-| Docker Container: react|
-+------------------------+
+Docker Container Diagram
+The application utilizes Docker to containerize its components for easy deployment and scalability. Below is an overview of the container setup:
 
-+------------------------+
-|    Node.js Backend     |  → Port 5000
-+------------------------+
-| Docker Container: api  |
-+------------------------+
+React Frontend Container:
 
-+------------------------+
-|       MySQL DB         |  → Port 3306
-+------------------------+
-| Docker Container: mysql|
-+------------------------+
+The React frontend is running in a Docker container, which is exposed on Port 3000.
+
+This container handles the user interface and communicates with the backend API.
+
+Docker Container: react
+
+Node.js Backend Container:
+
+The Node.js backend (Express API) runs in a separate Docker container, exposed on Port 5000.
+
+It handles API requests, authentication, and interaction with the database.
+
+Docker Container: api
+
+MySQL Database Container:
+
+The MySQL database is also containerized, running on Port 3306.
+
+It stores application data such as user information and any other relevant data.
+
+Docker Container: mysql
+
+These containers interact with each other through Docker networking, providing an isolated and manageable environment for the application.
 
 # Database Overview
  two main tables:
@@ -220,7 +229,7 @@ password_hash  VARCHAR   Hashed password
 created_at   TIMESTAMP   Auto timestamp
 
 
-🧱 2. api_keys Table
+ 2. api_keys Table
 Field      Type           Description
 id         INT (PK)        Primary Key
 key        VARCHAR         Generated API Key
