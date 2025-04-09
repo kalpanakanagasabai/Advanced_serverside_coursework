@@ -289,7 +289,7 @@ db.connect((err) => {
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // adjust this to match your frontend URL
+  origin: 'http://localhost:3000', 
   credentials: true // ALLOWS COOKIES
 }));
 app.use(bodyParser.json());
@@ -410,6 +410,71 @@ app.post('/api/generate-api-key', verifyToken, (req, res) => {
     // Send the generated API key back in the response
     res.json({ apiKey });
   });
+});
+
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+app.use(cors());
+
+
+// API Key Validation Middleware
+const validateApiKey = (req, res, next) => {
+  const apiKey = req.headers['x-api-key']; // Fetch the API key from headers
+  if (!apiKey) {
+    return res.status(400).json({ message: 'API key is missing.' });
+  }
+
+  // Query to check if the provided API key is valid
+  db.query('SELECT * FROM api_keys WHERE api_key = ?', [apiKey], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Database error.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Invalid API key.' });
+    }
+
+    // If valid, proceed to the next middleware
+    next();
+  });
+};
+
+
+const axios = require('axios');
+
+// Protected Route to fetch country information
+app.get('/api/countries/info', validateApiKey, async (req, res) => {
+  const countryName = req.query.name; // Get the country name from the query parameter
+
+  if (!countryName) {
+    return res.status(400).json({ error: 'Country name is required' });
+  }
+
+  try {
+    // Fetch country data from the RestCountries API
+    const response = await axios.get(`https://restcountries.com/v3.1/name/${countryName}`);
+
+    if (response.data.length === 0) {
+      return res.status(404).json({ error: 'Country not found' });
+    }
+
+    const country = response.data[0]; // Get the first result from the API response
+
+    const countryData = {
+      name: country.name.common,  // Country name
+      capital: country.capital ? country.capital[0] : 'N/A',  // Handle missing capital
+      currency: country.currencies ? Object.keys(country.currencies).join(', ') : 'N/A',  // Handle missing currency
+      languages: country.languages ? Object.values(country.languages).join(', ') : 'N/A',  // Handle missing languages
+      flag: country.flags[0], // Flag image URL
+    };
+
+    res.json(countryData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch country data. Please try again later.' });
+  }
 });
 
 // SERVER
