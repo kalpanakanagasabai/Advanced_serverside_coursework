@@ -22,14 +22,14 @@ const GetCountryData = () => {
     setApiKeyValid(true);
 
     try {
-      // Fetching country data from the REST API with the API key in the header
-      const response = await axios.get(`https://restcountries.com/v3.1/name/${countryName}`, {
+      // Fetching country data from YOUR BACKEND API with the API key in the header
+      const response = await axios.get(`http://localhost:5000/api/countries/info?name=${countryName}`, {
         headers: {
           'x-api-key': apiKey, // Include the API key in the request header
         },
       });
-      setCountryData(response.data[0]);
-      console.log("Fetched data:", response.data); 
+      setCountryData(response.data); // Your backend sends the formatted country data
+      console.log("Fetched data from backend:", response.data);
     } catch (err) {
       if (err.response && err.response.status === 401) {
         setError('Invalid API key. Please try again.');
@@ -53,7 +53,7 @@ const GetCountryData = () => {
   return (
     <div>
       <h1>Select a Country</h1>
-      
+
       {/* API Key Input */}
       <label>
         Enter API Key:
@@ -65,7 +65,7 @@ const GetCountryData = () => {
           style={{ marginLeft: 10, width: 300 }}
         />
       </label>
-      
+
       {/* API Key Error */}
       {!apiKeyValid && <p style={{ color: 'red' }}>The API key you entered is invalid. Please try again.</p>}
 
@@ -73,19 +73,19 @@ const GetCountryData = () => {
 
       {/* Country Selection Component */}
       <SelectCountry onSelectCountry={handleCountrySelection} />
-      
+
       {/* Loading and Error Messages */}
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      
+
       {/* Display Country Data */}
       {selectedCountry && countryData && !loading && (
         <div>
-          <h3>Country: {countryData.name.common}</h3>
+          <h3>Country: {countryData.name}</h3>
           <p><strong>Capital:</strong> {countryData.capital}</p>
-          <p><strong>Currency:</strong> {Object.values(countryData.currencies)[0].name}</p>
-          <p><strong>Languages:</strong> {Object.values(countryData.languages).join(', ')}</p>
-          <img src={countryData.flags.svg} alt={`${countryData.name.common} Flag`} width="100" />
+          <p><strong>Currency:</strong> {countryData.currency}</p>
+          <p><strong>Languages:</strong> {countryData.languages}</p>
+          <img src={countryData.flag} alt={`${countryData.name} Flag`} width="100" />
         </div>
       )}
     </div>
@@ -93,5 +93,3 @@ const GetCountryData = () => {
 };
 
 export default GetCountryData;
-
-
