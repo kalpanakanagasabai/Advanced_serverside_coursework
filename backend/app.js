@@ -257,7 +257,6 @@ app.get('/api/test-auth', validateApiKey, (req, res) => {
 });
 
 
-
 // SERVER
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

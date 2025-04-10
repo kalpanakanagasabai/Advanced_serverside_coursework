@@ -1,11 +1,10 @@
 const mysql = require('mysql2');
 
-// Replace 'my_database' with the actual name of your database
 const db = mysql.createConnection({
     host: 'localhost', // Host is usually localhost
     user: 'root', // MySQL username
     password: '1234', // MySQL password
-    database: 'my_database' // The correct database name you want to use
+    database: 'user_registration_db' // The correct database name you want to use
 });
 
 // Establish a connection to the MySQL server
